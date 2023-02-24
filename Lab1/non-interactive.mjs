@@ -2,10 +2,24 @@
 
 import * as fsPromises from 'node:fs/promises';
 
+fsPromises
+.readFile('params_data.txt', {
+  encoding: 'utf-8',
+})
+.then((data) => {
+  const processedData = data.split(' ').map((el) => +el);
+  evalEquation(processedData);
+})
+.catch((err) => {
+  console.error('Помилка: ', err);
+});
+
 const evalEquation = (processedData) => {
-  const [ a, b, c ] = processedData;
+  const [a, b, c] = processedData;
   if (a === 0 || isNaN(a) || isNaN(b) || isNaN(c)) {
-    console.error('Введіть правильні коефіцієнти, коефіцієнт a не має дорівнювати 0!');
+    console.error(
+      'Введіть правильні коефіцієнти, коефіцієнт a не має дорівнювати 0!'
+    );
     return;
   }
   const discriminant = b ** 2 - 4 * a * c;
@@ -23,11 +37,4 @@ const evalEquation = (processedData) => {
   }
 };
 
-try {
-  const data = await fsPromises.readFile(
-    "params_data.txt", { encoding: "utf-8" });
-  const processedData = data.split(' ').map((el) => +el);
-  evalEquation(processedData);
-} catch (err) {
-  console.error(err);
-}
+
