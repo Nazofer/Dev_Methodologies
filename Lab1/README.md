@@ -9,7 +9,7 @@
 
 2. Move to Lab1 directory: ```cd Lab1/```
 
-3. Run ```node interactive.js``` or ```node non-interactive.js```
+3. Run ```node interactive.js``` or ```node non-interactive.mjs```
 >**Note**<br> Install latest Node version to avoid possible errors<br> ```nvm install latest```<br> ```nvm use latest```
 
 
