@@ -1,91 +1,184 @@
 const ListNode = require('./listNode.js');
 
-class LinkedList extends Array {
+class LinkedList {
+  constructor() {
+    this.head = null;
+    this.tail = null;
+  }
+
   append(value) {
-    const node = new ListNode(value);
-    this.push(node);
+    const newNode = new ListNode(value);
+    let temp = this.head;
+    if (!temp) {
+      this.head = newNode;
+      newNode.next = this.head;
+      this.tail = newNode;
+      return;
+    } else {
+      this.tail.next = newNode;
+      this.tail = newNode;
+      this.tail.next = this.head;
+    }
+    while (temp.next !== this.head) {
+      temp = temp.next;
+    }
+    temp.next = newNode;
+    newNode.next = this.head;
+    this.tail = newNode;
   }
 
   getLength() {
-    return this.length;
+    if (!this.head && !this.tail) return 0;
+    let size = 0;
+    let node = this.head;
+    while (node.next !== this.head) {
+      size++;
+      node = node.next;
+    }
+    return ++size;
   }
 
   getByIndex(index) {
-    if (index < 0 || index > this.length) throw new Error('Invalid index');
-    return this[index].value;
+    if (index < 0 || index > this.getLength()) throw new Error('invalid index');
+
+    let temp = this.head;
+    let position = 0;
+    while (temp != this.tail) {
+      if (position === index) break;
+      temp = temp.next;
+      position += 1;
+    }
+    return temp.value;
   }
 
   insert(value, index) {
-    if (index < 0 || index > this.length) throw new Error('Invalid index');
-    const node = new ListNode(value);
-    this.splice(index, 0, node);
+    const newNode = new ListNode(value);
+    let temp = this.head;
+    if (index == 0) {
+      newNode.next = temp;
+      this.head = newNode;
+      this.tail.next = this.head;
+      return;
+    }
+    while (--index) {
+      if (temp.next !== this.head) temp = temp.next;
+    }
+    const tempNext = temp.next;
+    temp.next = newNode;
+    newNode.next = tempNext;
+    if (temp === this.tail) this.tail = newNode;
+    return;
   }
 
   findFirstByValue(value) {
-    let nodeToFind;
-    for (const node of this) {
-      if (node.value === value) {
-        nodeToFind = node;
-        break;
+    const size = this.getLength();
+    for (let i = 0; i < size; i++) {
+      const node = this.getByIndex(i);
+      if (node === value) {
+        return i;
       }
     }
-    return !!nodeToFind ? this.indexOf(nodeToFind) : -1;
+    return -1;
   }
 
   findLastByValue(value) {
-    let nodeToFind;
-    for (const node of this) {
-      if (node.value === value) nodeToFind = node;
+    let temp = this.head;
+    let index = 0;
+    let result = -1;
+
+    if (this.tail.value === value) result = this.getLength() - 1;
+    else {
+      while (temp != this.tail) {
+        if (temp.value === value) {
+          result = index;
+        }
+        temp = temp.next;
+        ++index;
+      }
     }
-    return !!nodeToFind ? this.lastIndexOf(nodeToFind) : -1;
+    return result;
   }
 
   clear() {
-    while (this.length > 0) {
-      this.pop();
-    }
+    this.head = null;
+    this.tail = null;
   }
 
   deleteByIndex(index) {
-    if (index < 0 || index > this.length) throw new Error('Invalid index');
+    if (index < 0 || index > this.getLength()) throw new Error('invalid index');
     const toDelete = this.getByIndex(index);
-    this.splice(index, 1);
+
+    let temp = this.head;
+    let prev;
+    if (!index) {
+      this.head = temp.next;
+      this.tail.next = this.head;
+      return toDelete;
+    }
+
+    for (let i = index; i > 0; i--) {
+      if (temp.next !== this.head) {
+        prev = temp;
+        temp = temp.next;
+      }
+    }
+
+    prev.next = temp.next;
+    if (temp === this.tail) {
+      prev.next = this.head;
+      this.tail = prev;
+    }
+
     return toDelete;
   }
 
   deleteAll(value) {
-    for (let i = 0; i < this.length; i++) {
-      if (this[i].value === value) {
-        this.splice(i, 1);
+    let size = this.getLength();
+    for (let i = 0; i < size; i++) {
+      const nodeValue = this.getByIndex(i);
+      if (nodeValue === value) {
+        this.deleteByIndex(i);
         i--;
+        size--;
       }
     }
   }
 
-  printList() {
-    const output = [];
-    for (const node of this) {
-      output.push(`${this.indexOf(node)}. ${node.value}`);
-    }
-    console.log(output.join(' => '));
-  }
-
   clone() {
-    const clone = new LinkedList();
-    for (const node of this) {
-      clone.append(node.value);
+    const newList = new LinkedList();
+    let temp = this.head;
+    while (temp.next !== this.head) {
+      newList.append(temp.value);
+      temp = temp.next;
     }
-    return clone;
+    newList.append(temp.value);
+    return newList;
   }
 
   reverseList() {
-    this.reverse();
-  }
+    let prevNode = this.tail;
+    let currentNode = this.head;
+    if (currentNode === null) return;
+    let nextNode;
 
-  extend(list) {
-    for (const node of list) {
-      this.append(node.value);
+    while (currentNode.next !== this.head) {
+      nextNode = currentNode.next;
+      currentNode.next = prevNode;
+      prevNode = currentNode;
+      currentNode = nextNode;
+      this.head = prevNode;
     }
+
+    this.tail = currentNode;
+  }
+ 
+  extend(list) {
+    let temp = list.head;
+    while (temp.next !== list.head) {
+      this.append(temp.value);
+      temp = temp.next;
+    }
+    this.append(temp.value);
   }
 }
 
